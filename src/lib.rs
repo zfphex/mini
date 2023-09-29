@@ -51,6 +51,8 @@ pub fn now() -> String {
 macro_rules! info {
     ($($arg:tt)*) => {
         #[cfg(not(feature = "strip"))]
+        #[cfg(not(feature = "error"))]
+        #[cfg(not(feature = "warn"))]
         {
             print!("\x1b[90m{} \x1b[92mINFO\x1b[0m  {}:\x1b[30m{}\x1b[0m - ", now(), file!(), line!());
             println!($($arg)*);
@@ -62,6 +64,7 @@ macro_rules! info {
 macro_rules! warn {
     ($($arg:tt)*) => {
         #[cfg(not(feature = "strip"))]
+        #[cfg(not(feature = "error"))]
         {
             print!("\x1b[90m{} \x1b[93mWARN\x1b[0m  {}:\x1b[30m{}\x1b[0m - ", now(), file!(), line!());
             println!($($arg)*);

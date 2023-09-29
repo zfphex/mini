@@ -7,3 +7,7 @@ edition = "2021"
 
 [features]
 strip = []
+
+info = []  # Unused.
+warn = []  # Allows warnings and errors.
+error = [] # Only allows errors. 
