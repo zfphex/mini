@@ -1,7 +1,7 @@
 use log::*;
 
 fn main() {
-    info!("Info");
-    warn!("Warn");
-    error!("Error");
+    info!("This is an info message");
+    warn!("This is a warning!");
+    error!("This is an error!!!");
 }
