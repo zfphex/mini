@@ -1,5 +1,5 @@
 ```rs
-use log::*;
+use minilog::*;
 
 fn main() {
     info!("This is an info message");
