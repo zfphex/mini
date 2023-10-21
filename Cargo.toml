@@ -1,17 +1,22 @@
 [package]
-name = "minilog"
-version = "0.1.1"
+name = "mini"
+version = "0.1.0"
 edition = "2021"
 authors = ["Bay"]
-description = "Zero-dependency logging library."
-repository = "https://github.com/zX3no/log"
+description = "Zero-dependency logging and profiling library."
+repository = "https://github.com/zX3no/mini"
 readme = "README.md"
 license = "CC0-1.0"
+
+[lib]
+name = "mini"
+path = "src/lib.rs"
 
 [dependencies]
 
 [features]
 strip = []
+profile = [] # Enable profiling.
 
 info = []  # Unused.
 warn = []  # Allows warnings and errors.
