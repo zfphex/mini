@@ -96,26 +96,33 @@ pub static mut EVENTS: Mutex<Vec<Event>> = Mutex::new(Vec::new());
 #[macro_export]
 macro_rules! results {
     () => {
-        $crate::results(None)
+        $crate::results(None);
     };
     ($($name:expr),*) => {
         {
             let names = &[$(
                 $name
             ),*];
-            $crate::results(Some(names))
+            $crate::results(Some(names));
         }
     };
 }
 
 /// Creates a string with the results of every profile.
 #[doc(hidden)]
-pub fn results(names: Option<&[&str]>) -> String {
+pub fn results(names: Option<&[&str]>) {
     let lock = unsafe { EVENTS.lock().unwrap() };
     let events = lock.as_slice();
 
+    if !cfg!(features = "profile") {
+        warn!(
+            "Trying to print results with profiling disabled. Enable with --features \"profile\""
+        );
+        return;
+    }
+
     if events.is_empty() {
-        unimplemented!();
+        panic!();
     }
 
     let mut map: HashMap<Location, Vec<Event>> = HashMap::new();
@@ -137,7 +144,9 @@ pub fn results(names: Option<&[&str]>) -> String {
         }
     }
 
-    calculate(map)
+    let results = calculate(map);
+
+    println!("{}", results);
 }
 
 fn calculate(map: HashMap<Location, Vec<Event>>) -> String {

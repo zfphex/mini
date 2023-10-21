@@ -8,10 +8,6 @@ repository = "https://github.com/zX3no/mini"
 readme = "README.md"
 license = "CC0-1.0"
 
-[lib]
-name = "mini"
-path = "src/lib.rs"
-
 [dependencies]
 
 [features]
