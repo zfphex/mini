@@ -94,11 +94,16 @@ use std::{
 pub static mut EVENTS: Mutex<Vec<Event>> = Mutex::new(Vec::new());
 
 #[macro_export]
-macro_rules! results {
+/// Print the profiling results.
+///
+/// Will not do anything is profiling is disabled.
+macro_rules! print_profile {
     () => {
+        #[cfg(feature = "profile")]
         $crate::results(None);
     };
     ($($name:expr),*) => {
+        #[cfg(feature = "profile")]
         {
             let names = &[$(
                 $name
@@ -114,15 +119,8 @@ pub fn results(names: Option<&[&str]>) {
     let lock = unsafe { EVENTS.lock().unwrap() };
     let events = lock.as_slice();
 
-    if !cfg!(features = "profile") {
-        warn!(
-            "Trying to print results with profiling disabled. Enable with --features \"profile\""
-        );
-        return;
-    }
-
     if events.is_empty() {
-        panic!();
+        return;
     }
 
     let mut map: HashMap<Location, Vec<Event>> = HashMap::new();
@@ -340,9 +338,6 @@ mod tests {
         hi();
         hi2();
 
-        let output = crate::results!("hi");
-        println!("{}", output);
-
-        println!("{}", crate::results(None));
+        crate::print_profile!("hi");
     }
 }

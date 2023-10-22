@@ -26,6 +26,5 @@ fn profile() {
     test_fn_2();
     test_fn_3();
 
-    println!("{}", results!());
-    println!("{}", results!("mini::test_fn", "Custom function name"));
+    print_profile!()
 }
