@@ -94,21 +94,39 @@ use std::{
 pub static mut EVENTS: Mutex<Vec<Event>> = Mutex::new(Vec::new());
 
 #[macro_export]
+/// Must go before any `profile!()` macros.
+/// Otherwise it won't be dropped last and can't print all the results.
+macro_rules! defer_print {
+    () => {
+        let _d = $crate::Defer(Some(|| {
+            $crate::results(None);
+        }));
+    };
+}
+
+#[macro_export]
 /// Print the profiling results.
 ///
 /// Will not do anything is profiling is disabled.
 macro_rules! print_profile {
     () => {
-        #[cfg(feature = "profile")]
+        // #[cfg(not(feature = "profile"))]
+        // panic!("Called print without profile being enabled");
+
+        // #[cfg(feature = "profile")]
         $crate::results(None);
     };
     ($($name:expr),*) => {
-        #[cfg(feature = "profile")]
+        // #[cfg(not(feature = "profile"))]
+        // panic!("Called print without profile being enabled");
+
+        // #[cfg(feature = "profile")]
         {
             let names = &[$(
                 $name
             ),*];
             $crate::results(Some(names));
+
         }
     };
 }
@@ -262,11 +280,11 @@ impl<F: FnOnce()> Drop for Defer<F> {
 #[macro_export]
 macro_rules! profile {
     () => {
-        #[cfg(feature = "profile")]
+        // #[cfg(feature = "profile")]
         let full_name = $crate::function!();
-        #[cfg(feature = "profile")]
+        // #[cfg(feature = "profile")]
         let name = &full_name[full_name.find("::").unwrap() + 2..];
-        #[cfg(feature = "profile")]
+        // #[cfg(feature = "profile")]
         let mut event = $crate::Event {
             location: $crate::Location {
                 full_name,
@@ -277,14 +295,14 @@ macro_rules! profile {
             start: Some(std::time::Instant::now()),
             end: None,
         };
-        #[cfg(feature = "profile")]
+        // #[cfg(feature = "profile")]
         let _d = $crate::Defer(Some(|| {
             event.end = Some(std::time::Instant::now());
             unsafe { $crate::EVENTS.lock().unwrap().push(event) };
         }));
     };
     ($name:expr) => {
-        #[cfg(feature = "profile")]
+        // #[cfg(feature = "profile")]
         let mut event = $crate::Event {
             location: $crate::Location {
                 full_name: $name,
@@ -295,7 +313,7 @@ macro_rules! profile {
             start: Some(std::time::Instant::now()),
             end: None,
         };
-        #[cfg(feature = "profile")]
+        // #[cfg(feature = "profile")]
         let _d = $crate::Defer(Some(|| {
             event.end = Some(std::time::Instant::now());
             unsafe { $crate::EVENTS.lock().unwrap().push(event) };

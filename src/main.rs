@@ -26,5 +26,5 @@ fn profile() {
     test_fn_2();
     test_fn_3();
 
-    print_profile!()
+    print_profile!();
 }
