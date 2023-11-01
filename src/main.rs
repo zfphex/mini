@@ -2,8 +2,11 @@ use mini::*;
 
 fn main() {
     info!("This is an info message");
+    info_raw!("This is an raw info message");
     warn!("This is a warning!");
-    error!("This is an error!!!");
+    warn_raw!("This is a raw warning!");
+    error!("This is an error!");
+    error_raw!("This is a raw error!");
 
     profile();
 }

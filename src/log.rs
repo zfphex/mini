@@ -61,6 +61,31 @@ macro_rules! info {
 }
 
 #[macro_export]
+macro_rules! info_raw {
+    ($($arg:tt)*) => {
+        #[cfg(not(feature = "strip"))]
+        #[cfg(not(feature = "error"))]
+        #[cfg(not(feature = "warn"))]
+        {
+            print!("\x1b[90m{} \x1b[92mINFO\x1b[0m ", $crate::now());
+            println!($($arg)*);
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! warn_raw {
+    ($($arg:tt)*) => {
+        #[cfg(not(feature = "strip"))]
+        #[cfg(not(feature = "error"))]
+        {
+            print!("\x1b[90m{} \x1b[93mWARN\x1b[0m ", $crate::now());
+            println!($($arg)*);
+        }
+    };
+}
+
+#[macro_export]
 macro_rules! warn {
     ($($arg:tt)*) => {
         #[cfg(not(feature = "strip"))]
@@ -78,6 +103,17 @@ macro_rules! error {
         #[cfg(not(feature = "strip"))]
         {
             print!("\x1b[90m{} \x1b[91mERROR\x1b[0m {}:\x1b[30m{}\x1b[0m - ", $crate::now(), file!(), line!());
+            println!($($arg)*);
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! error_raw {
+    ($($arg:tt)*) => {
+        #[cfg(not(feature = "strip"))]
+        {
+            print!("\x1b[90m{} \x1b[91mERROR\x1b[0m ", $crate::now());
             println!($($arg)*);
         }
     };
