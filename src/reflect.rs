@@ -1,4 +1,3 @@
-#[macro_export]
 /// A macro to help you with compile-time reflection. It's not real reflection but it's useful.
 /// ```rs
 /// reflect! {
@@ -10,6 +9,7 @@
 /// asssert!(Key::from_str("SPACE").is_ok())
 ///
 /// Note in this example `Key::from_str` can take in both `Space` and `SPACE`.
+#[macro_export]
 macro_rules! reflect {
     ($enum_name:ident, $($name:ident $(=> $str:expr)?),*) => {
         #[derive(Debug, PartialEq, Clone)]
