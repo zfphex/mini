@@ -1,3 +1,4 @@
+///! TODO: Fix profile feature.
 use std::{
     collections::{hash_map::Entry, HashMap},
     fmt::Write,
@@ -11,11 +12,25 @@ pub static mut EVENTS: Mutex<Vec<Event>> = Mutex::new(Vec::new());
 #[macro_export]
 /// Must go before any `profile!()` macros.
 /// Otherwise it won't be dropped last and can't print all the results.
-macro_rules! defer_print {
+macro_rules! defer_results {
     () => {
         let _d = $crate::Defer(Some(|| {
             $crate::results(None);
         }));
+    };
+    ($($name:expr),*) => {
+        // #[cfg(not(feature = "profile"))]
+        // panic!("Called print without profile being enabled");
+
+        // #[cfg(feature = "profile")]
+        {
+            let names = &[$(
+                $name
+            ),*];
+            let _d = $crate::Defer(Some(|| {
+                $crate::results(Some(names));
+            }));
+        }
     };
 }
 
@@ -23,7 +38,7 @@ macro_rules! defer_print {
 /// Print the profiling results.
 ///
 /// Will not do anything is profiling is disabled.
-macro_rules! print_profile {
+macro_rules! results {
     () => {
         // #[cfg(not(feature = "profile"))]
         // panic!("Called print without profile being enabled");
@@ -271,6 +286,6 @@ mod tests {
         hi();
         hi2();
 
-        crate::print_profile!("hi");
+        crate::results(Some(&["hi"]));
     }
 }

@@ -47,15 +47,30 @@ pub fn now() -> String {
     format!("{:02}:{:02}:{:02}", time.hour, time.minute, time.second)
 }
 
+#[repr(u8)]
+pub enum Level {
+    Strip,
+    Error,
+    Warn,
+    Info,
+}
+
+//TODO: Fix other flags
+
+#[cfg(feature = "strip")]
+pub static MAX_LEVEL: u8 = Level::Strip as u8;
+
+#[cfg(not(feature = "strip"))]
+pub static MAX_LEVEL: u8 = Level::Info as u8;
+
 #[macro_export]
 macro_rules! info {
     ($($arg:tt)*) => {
-        #[cfg(not(feature = "strip"))]
-        #[cfg(not(feature = "error"))]
-        #[cfg(not(feature = "warn"))]
         {
-            print!("\x1b[90m{} \x1b[92mINFO\x1b[0m {}:\x1b[30m{}\x1b[0m - ", $crate::now(), file!(), line!());
-            println!($($arg)*);
+            if MAX_LEVEL >= Level::Info as u8{
+                print!("\x1b[90m{} \x1b[92mINFO\x1b[0m {}:\x1b[30m{}\x1b[0m - ", $crate::now(), file!(), line!());
+                println!($($arg)*);
+            }
         }
     };
 }
@@ -63,12 +78,11 @@ macro_rules! info {
 #[macro_export]
 macro_rules! info_raw {
     ($($arg:tt)*) => {
-        #[cfg(not(feature = "strip"))]
-        #[cfg(not(feature = "error"))]
-        #[cfg(not(feature = "warn"))]
         {
-            print!("\x1b[90m{} \x1b[92mINFO\x1b[0m ", $crate::now());
-            println!($($arg)*);
+            if MAX_LEVEL >= Level::Info as u8{
+                print!("\x1b[90m{} \x1b[92mINFO\x1b[0m ", $crate::now());
+                println!($($arg)*);
+            }
         }
     };
 }
@@ -76,11 +90,11 @@ macro_rules! info_raw {
 #[macro_export]
 macro_rules! warn_raw {
     ($($arg:tt)*) => {
-        #[cfg(not(feature = "strip"))]
-        #[cfg(not(feature = "error"))]
         {
-            print!("\x1b[90m{} \x1b[93mWARN\x1b[0m ", $crate::now());
-            println!($($arg)*);
+            if MAX_LEVEL >= Level::Warn as u8{
+                print!("\x1b[90m{} \x1b[93mWARN\x1b[0m ", $crate::now());
+                println!($($arg)*);
+            }
         }
     };
 }
@@ -88,11 +102,11 @@ macro_rules! warn_raw {
 #[macro_export]
 macro_rules! warn {
     ($($arg:tt)*) => {
-        #[cfg(not(feature = "strip"))]
-        #[cfg(not(feature = "error"))]
         {
-            print!("\x1b[90m{} \x1b[93mWARN\x1b[0m {}:\x1b[30m{}\x1b[0m - ", $crate::now(), file!(), line!());
-            println!($($arg)*);
+            if MAX_LEVEL >= Level::Warn as u8{
+                print!("\x1b[90m{} \x1b[93mWARN\x1b[0m {}:\x1b[30m{}\x1b[0m - ", $crate::now(), file!(), line!());
+                println!($($arg)*);
+            }
         }
     };
 }
@@ -100,10 +114,11 @@ macro_rules! warn {
 #[macro_export]
 macro_rules! error {
     ($($arg:tt)*) => {
-        #[cfg(not(feature = "strip"))]
         {
-            print!("\x1b[90m{} \x1b[91mERROR\x1b[0m {}:\x1b[30m{}\x1b[0m - ", $crate::now(), file!(), line!());
-            println!($($arg)*);
+            if MAX_LEVEL >= Level::Error as u8{
+                print!("\x1b[90m{} \x1b[91mERROR\x1b[0m {}:\x1b[30m{}\x1b[0m - ", $crate::now(), file!(), line!());
+                println!($($arg)*);
+            }
         }
     };
 }
@@ -111,10 +126,11 @@ macro_rules! error {
 #[macro_export]
 macro_rules! error_raw {
     ($($arg:tt)*) => {
-        #[cfg(not(feature = "strip"))]
         {
-            print!("\x1b[90m{} \x1b[91mERROR\x1b[0m ", $crate::now());
-            println!($($arg)*);
+            if MAX_LEVEL >= Level::Error as u8{
+                print!("\x1b[90m{} \x1b[91mERROR\x1b[0m ", $crate::now());
+                println!($($arg)*);
+            }
         }
     };
 }
