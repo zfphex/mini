@@ -1,14 +1,16 @@
 /// A macro to help you with compile-time reflection. It's not real reflection but it's useful.
-/// ```rs
-/// reflect! {
-///     Key, //Enum name
-///     F1,  //Enum member
-///     Space => "SPACE" //Enum memeber with custom string
-/// }
 /// ```
-/// asssert!(Key::from_str("SPACE").is_ok())
-///
-/// Note in this example `Key::from_str` can take in both `Space` and `SPACE`.
+/// use mini::reflect;
+/// 
+/// reflect! {
+///     Key,             //enum Key
+///     F1,              //Key::F1
+///     Space => "SPACE" //Key::Space
+/// }
+/// 
+/// assert!(Key::from_str("SPACE").is_ok());
+/// assert!(Key::from_str("Space").is_ok());
+/// ```
 #[macro_export]
 macro_rules! reflect {
     ($enum_name:ident, $($name:ident $(=> $str:expr)?),*) => {

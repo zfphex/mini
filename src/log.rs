@@ -1,4 +1,5 @@
 #[cfg(not(target_os = "windows"))]
+#[doc(hidden)]
 pub fn now() -> String {
     static mut ONCE: std::sync::Once = std::sync::Once::new();
     static mut TZ: i64 = 0;
@@ -41,12 +42,14 @@ mod win {
 
 #[cfg(target_os = "windows")]
 #[inline(always)]
+#[doc(hidden)]
 pub fn now() -> String {
     let mut time = win::SystemTime::default();
     unsafe { win::GetLocalTime(&mut time) };
     format!("{:02}:{:02}:{:02}", time.hour, time.minute, time.second)
 }
 
+#[doc(hidden)]
 #[repr(u8)]
 pub enum Level {
     Strip,
@@ -55,13 +58,21 @@ pub enum Level {
     Info,
 }
 
-//TODO: Fix other flags
-
+#[doc(hidden)]
 #[cfg(feature = "strip")]
 pub static MAX_LEVEL: u8 = Level::Strip as u8;
 
-#[cfg(not(feature = "strip"))]
+#[doc(hidden)]
+#[cfg(all(not(feature = "warn"), not(feature = "error"), not(feature = "strip")))]
 pub static MAX_LEVEL: u8 = Level::Info as u8;
+
+#[doc(hidden)]
+#[cfg(all(feature = "warn", not(feature = "error"), not(feature = "strip")))]
+pub static MAX_LEVEL: u8 = Level::Warn as u8;
+
+#[doc(hidden)]
+#[cfg(all(feature = "error", not(feature = "warn"), not(feature = "strip")))]
+pub static MAX_LEVEL: u8 = Level::Error as u8;
 
 #[macro_export]
 macro_rules! info {
