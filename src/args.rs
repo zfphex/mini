@@ -1,4 +1,3 @@
-/// 
 /// Only supports boolean flags.
 /// 
 /// ```
@@ -22,12 +21,12 @@
 /// ```
 #[macro_export]
 macro_rules! args {
-    //TODO: Any way to do optional struct?
-    ($($arg:tt, $description:expr, $($element:ident),*);* $(;)?) => {
+    //TODO: Any way to make structs optional?
+    ($($arg:tt, $description:expr, $($field:ident),*);* $(;)?) => {
         $(
             #[derive(Debug, Default)]
             pub struct $arg {
-                $(pub $element: bool),*
+                $(pub $field: bool),*
             }
         )*
 
@@ -57,8 +56,8 @@ macro_rules! args {
                     #[allow(unused)]
                     let mut s = $arg::default();
                     $(
-                        if flags.contains(&format!("--{}", stringify!($element))) {
-                            s.$element = true;
+                        if flags.contains(&format!("--{}", stringify!($field))) {
+                            s.$field = true;
                         }
                     )*
 
@@ -71,11 +70,16 @@ macro_rules! args {
 
         pub fn help() {
             println!("Usage:");
-            println!("\tcargo [<option> <args>]");
+            println!("\t{} [<command> <flags>]", env!("CARGO_CRATE_NAME"));
             println!("Commands:");
             $(
                 //TODO: Tab padding.
                 println!("\t{}\t{}", stringify!($arg).to_lowercase(), $description);
+                $(
+                    //TODO: This is quite difficult to read.
+                    println!("\t\t--{}", stringify!($field));
+                )*
+                println!();
             )*
         }
     }
