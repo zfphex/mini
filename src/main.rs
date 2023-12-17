@@ -1,4 +1,4 @@
-use mini::*;
+use mini::{args, error, info, warn};
 
 //Only supports boolean flags.
 args![
@@ -9,9 +9,9 @@ args![
 ];
 
 fn main() {
-    info!("");
-    warn!("");
-    error!("");
+    info!("info");
+    warn!("warn");
+    error!("error");
 
     match args() {
         Command::Run(run) => println!("Run without showing output? {}", run.quiet),

@@ -78,7 +78,7 @@ pub static MAX_LEVEL: u8 = Level::Error as u8;
 macro_rules! info {
     ($($arg:tt)*) => {
         {
-            if MAX_LEVEL >= Level::Info as u8 {
+            if $crate::MAX_LEVEL >= $crate::Level::Info as u8 {
                 eprint!("\x1b[90m{} \x1b[92mINFO\x1b[0m {}:\x1b[30m{}\x1b[0m - ", $crate::now(), file!(), line!());
                 eprintln!($($arg)*);
             }
@@ -90,7 +90,7 @@ macro_rules! info {
 macro_rules! info_raw {
     ($($arg:tt)*) => {
         {
-            if MAX_LEVEL >= Level::Info as u8 {
+            if $crate::MAX_LEVEL >= $crate::Level::Info as u8 {
                 eprint!("\x1b[90m{} \x1b[92mINFO\x1b[0m ", $crate::now());
                 eprintln!($($arg)*);
             }
@@ -102,7 +102,7 @@ macro_rules! info_raw {
 macro_rules! warn_raw {
     ($($arg:tt)*) => {
         {
-            if MAX_LEVEL >= Level::Warn as u8 {
+            if $crate::MAX_LEVEL >= $crate::Level::Warn as u8 {
                 eprint!("\x1b[90m{} \x1b[93mWARN\x1b[0m ", $crate::now());
                 eprintln!($($arg)*);
             }
@@ -114,7 +114,7 @@ macro_rules! warn_raw {
 macro_rules! warn {
     ($($arg:tt)*) => {
         {
-            if MAX_LEVEL >= Level::Warn as u8 {
+            if $crate::MAX_LEVEL >= $crate::Level::Warn as u8 {
                 eprint!("\x1b[90m{} \x1b[93mWARN\x1b[0m {}:\x1b[30m{}\x1b[0m - ", $crate::now(), file!(), line!());
                 eprintln!($($arg)*);
             }
@@ -126,7 +126,7 @@ macro_rules! warn {
 macro_rules! error {
     ($($arg:tt)*) => {
         {
-            if MAX_LEVEL >= Level::Error as u8 {
+            if $crate::MAX_LEVEL >= $crate::Level::Error as u8 {
                 eprint!("\x1b[90m{} \x1b[91mERROR\x1b[0m {}:\x1b[30m{}\x1b[0m - ", $crate::now(), file!(), line!());
                 eprintln!($($arg)*);
             }
@@ -138,7 +138,7 @@ macro_rules! error {
 macro_rules! error_raw {
     ($($arg:tt)*) => {
         {
-            if MAX_LEVEL >= Level::Error as u8 {
+            if $crate::MAX_LEVEL >= $crate::Level::Error as u8 {
                 eprint!("\x1b[90m{} \x1b[91mERROR\x1b[0m ", $crate::now());
                 eprintln!($($arg)*);
             }
