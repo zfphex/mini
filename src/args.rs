@@ -1,15 +1,15 @@
 /// Only supports boolean flags.
-/// 
+///
 /// ```
 /// use mini::args;
-/// 
+///
 /// args![
 ///     Run, "Runs the program", release, quiet;
 ///     Build, "Builds the program", release;
 ///     Test, "Tests the program",;
 ///     Bench, "",;
 /// ];
-/// 
+///
 /// //args() & help() will be defined in same file as args![].
 /// match args() {
 ///     Command::Run(run) => println!("Run without showing output? {}", run.quiet),

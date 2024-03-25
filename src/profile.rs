@@ -22,7 +22,7 @@ macro_rules! defer_results {
         // #[cfg(not(feature = "profile"))]
         // panic!("Called print without profile being enabled");
 
-        // #[cfg(feature = "profile")]
+        #[cfg(not(feature = "strip"))]
         {
             let names = &[$(
                 $name
@@ -43,14 +43,14 @@ macro_rules! results {
         // #[cfg(not(feature = "profile"))]
         // panic!("Called print without profile being enabled");
 
-        // #[cfg(feature = "profile")]
+        // #[cfg(not(feature = "strip"))]
         $crate::results(None);
     };
     ($($name:expr),*) => {
         // #[cfg(not(feature = "profile"))]
         // panic!("Called print without profile being enabled");
 
-        // #[cfg(feature = "profile")]
+        // #[cfg(not(feature = "strip"))]
         {
             let names = &[$(
                 $name
@@ -210,11 +210,11 @@ impl<F: FnOnce()> Drop for Defer<F> {
 #[macro_export]
 macro_rules! profile {
     () => {
-        // #[cfg(feature = "profile")]
+        #[cfg(not(feature = "strip"))]
         let full_name = $crate::function!();
-        // #[cfg(feature = "profile")]
+        #[cfg(not(feature = "strip"))]
         let name = &full_name[full_name.find("::").unwrap() + 2..];
-        // #[cfg(feature = "profile")]
+        #[cfg(not(feature = "strip"))]
         let mut event = $crate::Event {
             location: $crate::Location {
                 full_name,
@@ -225,14 +225,14 @@ macro_rules! profile {
             start: Some(std::time::Instant::now()),
             end: None,
         };
-        // #[cfg(feature = "profile")]
+        #[cfg(not(feature = "strip"))]
         let _d = $crate::Defer(Some(|| {
             event.end = Some(std::time::Instant::now());
             unsafe { $crate::EVENTS.lock().unwrap().push(event) };
         }));
     };
     ($name:expr) => {
-        // #[cfg(feature = "profile")]
+        #[cfg(not(feature = "strip"))]
         let mut event = $crate::Event {
             location: $crate::Location {
                 full_name: $name,
@@ -243,7 +243,7 @@ macro_rules! profile {
             start: Some(std::time::Instant::now()),
             end: None,
         };
-        // #[cfg(feature = "profile")]
+        #[cfg(not(feature = "strip"))]
         let _d = $crate::Defer(Some(|| {
             event.end = Some(std::time::Instant::now());
             unsafe { $crate::EVENTS.lock().unwrap().push(event) };
