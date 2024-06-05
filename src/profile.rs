@@ -7,7 +7,7 @@ use std::{
 };
 
 #[doc(hidden)]
-pub static mut EVENTS: Mutex<Vec<Event>> = Mutex::new(Vec::new());
+pub static mut EVENTS: Mutex<Vec<ProfileEvent>> = Mutex::new(Vec::new());
 
 #[macro_export]
 /// Must go before any `profile!()` macros.
@@ -71,7 +71,7 @@ pub fn results(names: Option<&[&str]>) {
         return;
     }
 
-    let mut map: HashMap<Location, Vec<Event>> = HashMap::new();
+    let mut map: HashMap<ProfileLocation, Vec<ProfileEvent>> = HashMap::new();
 
     for event in events {
         if let Some(names) = names {
@@ -95,12 +95,12 @@ pub fn results(names: Option<&[&str]>) {
     println!("{}", results);
 }
 
-fn calculate(map: HashMap<Location, Vec<Event>>) -> String {
+fn calculate(map: HashMap<ProfileLocation, Vec<ProfileEvent>>) -> String {
     let mut scores = Vec::new();
 
     for (k, v) in map.iter() {
         let mut mean = Duration::default();
-        let mut min = v.get(0).unwrap_or(&Event::default()).elapsed();
+        let mut min = v.get(0).unwrap_or(&ProfileEvent::default()).elapsed();
         let mut max = Duration::default();
 
         for event in v {
@@ -117,7 +117,7 @@ fn calculate(map: HashMap<Location, Vec<Event>>) -> String {
             mean += elapsed;
         }
 
-        scores.push(Score {
+        scores.push(ProfileScore {
             full_name: k.full_name,
             file: k.file,
             line: k.line,
@@ -148,13 +148,13 @@ fn calculate(map: HashMap<Location, Vec<Event>>) -> String {
 
 #[doc(hidden)]
 #[derive(Clone, Debug, Default)]
-pub struct Event {
-    pub location: Location,
+pub struct ProfileEvent {
+    pub location: ProfileLocation,
     pub start: Option<Instant>,
     pub end: Option<Instant>,
 }
 
-impl Event {
+impl ProfileEvent {
     pub fn elapsed(&self) -> Duration {
         self.end.unwrap().duration_since(self.start.unwrap())
     }
@@ -162,7 +162,7 @@ impl Event {
 
 #[doc(hidden)]
 #[derive(Debug, Default)]
-pub struct Score {
+pub struct ProfileScore {
     pub full_name: &'static str,
     pub file: &'static str,
     pub line: u32,
@@ -175,7 +175,7 @@ pub struct Score {
 
 #[doc(hidden)]
 #[derive(Hash, Eq, PartialEq, Clone, Debug, Default)]
-pub struct Location {
+pub struct ProfileLocation {
     pub full_name: &'static str,
     pub name: &'static str,
     pub file: &'static str,
@@ -215,8 +215,8 @@ macro_rules! profile {
         #[cfg(not(feature = "strip"))]
         let name = &full_name[full_name.find("::").unwrap() + 2..];
         #[cfg(not(feature = "strip"))]
-        let mut event = $crate::Event {
-            location: $crate::Location {
+        let mut event = $crate::ProfileEvent {
+            location: $crate::ProfileLocation {
                 full_name,
                 name,
                 file: file!(),
@@ -233,8 +233,8 @@ macro_rules! profile {
     };
     ($name:expr) => {
         #[cfg(not(feature = "strip"))]
-        let mut event = $crate::Event {
-            location: $crate::Location {
+        let mut event = $crate::ProfileEvent {
+            location: $crate::ProfileLocation {
                 full_name: $name,
                 name: $name,
                 file: file!(),
