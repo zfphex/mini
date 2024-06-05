@@ -10,6 +10,7 @@ use std::{
 pub static mut EVENTS: Mutex<Vec<ProfileEvent>> = Mutex::new(Vec::new());
 
 #[macro_export]
+/// Print profile results after drop.
 /// Must go before any `profile!()` macros.
 /// Otherwise it won't be dropped last and can't print all the results.
 macro_rules! defer_results {
@@ -19,9 +20,6 @@ macro_rules! defer_results {
         }));
     };
     ($($name:expr),*) => {
-        // #[cfg(not(feature = "profile"))]
-        // panic!("Called print without profile being enabled");
-
         #[cfg(not(feature = "strip"))]
         {
             let names = &[$(
@@ -36,27 +34,17 @@ macro_rules! defer_results {
 
 #[macro_export]
 /// Print the profiling results.
-///
-/// Will not do anything is profiling is disabled.
 macro_rules! results {
     () => {
-        // #[cfg(not(feature = "profile"))]
-        // panic!("Called print without profile being enabled");
-
-        // #[cfg(not(feature = "strip"))]
         $crate::results(None);
     };
     ($($name:expr),*) => {
-        // #[cfg(not(feature = "profile"))]
-        // panic!("Called print without profile being enabled");
-
-        // #[cfg(not(feature = "strip"))]
+        #[cfg(not(feature = "strip"))]
         {
             let names = &[$(
                 $name
             ),*];
             $crate::results(Some(names));
-
         }
     };
 }
@@ -251,9 +239,11 @@ macro_rules! profile {
     };
 }
 
+/// Unimplemented
 #[macro_export]
 macro_rules! step {
     ($name:expr) => {
+        todo!()
         /*
         pub fn test() {
             profile!();

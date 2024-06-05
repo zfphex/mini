@@ -1,13 +1,13 @@
 /// A macro to help you with compile-time reflection. It's not real reflection but it's useful.
 /// ```
 /// use mini::reflect;
-/// 
+///
 /// reflect! {
 ///     Key,             //enum Key
 ///     F1,              //Key::F1
 ///     Space => "SPACE" //Key::Space
 /// }
-/// 
+///
 /// assert!(Key::from_str("SPACE").is_ok());
 /// assert!(Key::from_str("Space").is_ok());
 /// ```
