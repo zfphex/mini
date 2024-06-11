@@ -35,6 +35,7 @@ pub struct SHFILEOPSTRUCTW {
 #[must_use]
 /// Send a file/folder to the Recycle Bin.
 /// You should use fully qualified path names with this function.
+/// This function is very slow, consider spawning a new thread to handle deletions.
 pub fn trash<P: AsRef<std::path::Path>>(path: P) -> Result<(), &'static str> {
     use std::os::windows::ffi::OsStrExt;
 
@@ -62,9 +63,8 @@ pub fn trash<P: AsRef<std::path::Path>>(path: P) -> Result<(), &'static str> {
         l_psz_progress_title: std::ptr::null(),
     };
 
-    unsafe {
-        let result = SHFileOperationW(&mut fileop);
-        match result {
+    let result = unsafe { SHFileOperationW(&mut fileop) };
+    match result {
             0x0 => {Ok(())}
             0x2 => Err("The system cannot find the file specified."),
             0x5 => Err("Access is denied."),
@@ -95,5 +95,4 @@ pub fn trash<P: AsRef<std::path::Path>>(path: P) -> Result<(), &'static str> {
             //https://learn.microsoft.com/en-us/windows/win32/debug/system-error-codes--0-499-
             _ => panic!("Unknown error, see system error code: {:#02x}", result),
         }
-    }
 }
