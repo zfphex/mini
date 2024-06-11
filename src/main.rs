@@ -1,4 +1,4 @@
-use mini::{args, error, info, warn, defer_results, profile};
+use mini::*;
 
 //Only supports boolean flags.
 args![
