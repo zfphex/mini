@@ -39,7 +39,10 @@ pub fn trash<P: AsRef<std::path::Path>>(path: P) -> Result<(), &'static str> {
     use std::os::windows::ffi::OsStrExt;
 
     let path = path.as_ref();
-    assert!(path.is_absolute());
+
+    if !path.is_absolute() {
+        return Err("Path must be absolute.");
+    }
 
     //This string must be double-null terminated.
     let os_path: Vec<u16> = path
