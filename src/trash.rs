@@ -39,7 +39,6 @@ pub fn trash<P: AsRef<std::path::Path>>(path: P) -> Result<(), &'static str> {
     use std::os::windows::ffi::OsStrExt;
 
     let path = path.as_ref();
-
     if !path.is_absolute() {
         return Err("Path must be absolute.");
     }
@@ -93,7 +92,8 @@ pub fn trash<P: AsRef<std::path::Path>>(path: P) -> Result<(), &'static str> {
             0xB7 => Err("MAX_PATH was exceeded during the operation."),
             0x10000 => Err("An unspecified error occurred on the destination."),
             0x10074 => Err("Destination is a root directory and cannot be renamed."),
-            _ => panic!("Unknown error: {:#02x}", result),
+            //https://learn.microsoft.com/en-us/windows/win32/debug/system-error-codes--0-499-
+            _ => panic!("Unknown error, see system error code: {:#02x}", result),
         }
     }
 }
