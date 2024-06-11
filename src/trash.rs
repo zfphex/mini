@@ -32,10 +32,10 @@ pub struct SHFILEOPSTRUCTW {
     pub l_psz_progress_title: *const u16,
 }
 
-#[must_use]
 /// Send a file/folder to the Recycle Bin.
 /// You should use fully qualified path names with this function.
 /// This function is very slow, consider spawning a new thread to handle deletions.
+#[must_use]
 pub fn trash<P: AsRef<std::path::Path>>(path: P) -> Result<(), &'static str> {
     use std::os::windows::ffi::OsStrExt;
 
