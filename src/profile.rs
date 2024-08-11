@@ -15,6 +15,7 @@ pub static mut EVENTS: Mutex<Vec<ProfileEvent>> = Mutex::new(Vec::new());
 /// Otherwise it won't be dropped last and can't print all the results.
 macro_rules! defer_results {
     () => {
+        #[cfg(not(feature = "strip"))]
         let _d = $crate::Defer(Some(|| {
             $crate::results(None);
         }));
@@ -36,6 +37,7 @@ macro_rules! defer_results {
 /// Print the profiling results.
 macro_rules! results {
     () => {
+        #[cfg(not(feature = "strip"))]
         $crate::results(None);
     };
     ($($name:expr),*) => {
