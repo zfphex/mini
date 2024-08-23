@@ -11,8 +11,7 @@ license = "CC0-1.0"
 [dependencies]
 
 [features]
-strip = []   # Strip all logging and profiling.
-
-info = []  # Unused.
-warn = []  # Allows warnings and errors.
-error = [] # Only allows errors. 
+profile = [] # Enable profiling.
+info = []    # Show all logging.
+warn = []    # Allows warnings and errors.
+error = []   # Only allows errors.

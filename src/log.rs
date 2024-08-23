@@ -52,26 +52,25 @@ pub fn now() -> String {
 #[doc(hidden)]
 #[repr(u8)]
 pub enum Level {
-    Strip,
+    None,
     Error,
     Warn,
     Info,
 }
 
-#[doc(hidden)]
-#[cfg(feature = "strip")]
-pub static MAX_LEVEL: u8 = Level::Strip as u8;
+#[cfg(all(not(feature = "warn"), not(feature = "error"), not(feature = "info")))]
+pub static MAX_LEVEL: u8 = Level::None as u8;
 
 #[doc(hidden)]
-#[cfg(all(not(feature = "warn"), not(feature = "error"), not(feature = "strip")))]
+#[cfg(all(feature = "info", not(feature = "warn"), not(feature = "error")))]
 pub static MAX_LEVEL: u8 = Level::Info as u8;
 
 #[doc(hidden)]
-#[cfg(all(feature = "warn", not(feature = "error"), not(feature = "strip")))]
+#[cfg(all(feature = "warn", not(feature = "error"), not(feature = "info")))]
 pub static MAX_LEVEL: u8 = Level::Warn as u8;
 
 #[doc(hidden)]
-#[cfg(all(feature = "error", not(feature = "warn"), not(feature = "strip")))]
+#[cfg(all(feature = "error", not(feature = "warn"), not(feature = "info")))]
 pub static MAX_LEVEL: u8 = Level::Error as u8;
 
 #[macro_export]

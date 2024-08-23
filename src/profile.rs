@@ -200,11 +200,11 @@ impl<F: FnOnce()> Drop for Defer<F> {
 #[macro_export]
 macro_rules! profile {
     () => {
-        #[cfg(not(feature = "strip"))]
+        #[cfg(feature = "profile")]
         let full_name = $crate::function!();
-        #[cfg(not(feature = "strip"))]
+        #[cfg(feature = "profile")]
         let name = &full_name[full_name.find("::").unwrap() + 2..];
-        #[cfg(not(feature = "strip"))]
+        #[cfg(feature = "profile")]
         let mut event = $crate::ProfileEvent {
             location: $crate::ProfileLocation {
                 full_name,
@@ -215,14 +215,14 @@ macro_rules! profile {
             start: Some(std::time::Instant::now()),
             end: None,
         };
-        #[cfg(not(feature = "strip"))]
+        #[cfg(feature = "profile")]
         let _d = $crate::Defer(Some(|| {
             event.end = Some(std::time::Instant::now());
             unsafe { $crate::EVENTS.lock().unwrap().push(event) };
         }));
     };
     ($name:expr) => {
-        #[cfg(not(feature = "strip"))]
+        #[cfg(feature = "profile")]
         let mut event = $crate::ProfileEvent {
             location: $crate::ProfileLocation {
                 full_name: $name,
