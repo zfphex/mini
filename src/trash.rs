@@ -37,16 +37,17 @@ pub struct SHFILEOPSTRUCTW {
 /// This function is very slow, consider spawning a new thread to handle deletions.
 #[must_use]
 pub fn trash<P: AsRef<std::path::Path>>(path: P) -> Result<(), &'static str> {
+    crate::profile!();
     use std::os::windows::ffi::OsStrExt;
 
-    let path = path.as_ref();
-    if !path.is_absolute() {
-        return Err("Path must be absolute.");
-    }
+    let path = match path.as_ref().canonicalize() {
+        //Replace the UNC prefix.
+        Ok(path) => path.to_string_lossy().replace("\\\\?\\", ""),
+        Err(_) => return Err("Could not find path"),
+    };
 
     //This string must be double-null terminated.
-    let os_path: Vec<u16> = path
-        .as_os_str()
+    let os_path: Vec<u16> = std::ffi::OsString::from(path)
         .encode_wide()
         .chain(Some(0))
         .chain(Some(0))
