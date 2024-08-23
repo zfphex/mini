@@ -58,6 +58,7 @@ pub enum Level {
     Info,
 }
 
+#[doc(hidden)]
 #[cfg(all(not(feature = "warn"), not(feature = "error"), not(feature = "info")))]
 pub static MAX_LEVEL: u8 = Level::None as u8;
 

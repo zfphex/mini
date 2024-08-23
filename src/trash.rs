@@ -1,15 +1,15 @@
 #[link(name = "shell32")]
 extern "system" {
-    pub fn SHFileOperationW(lpFileOp: *mut SHFILEOPSTRUCTW) -> i32;
+    fn SHFileOperationW(lpFileOp: *mut SHFILEOPSTRUCTW) -> i32;
 }
 
-pub const FO_DELETE: u16 = 0x0003;
-pub const FOF_ALLOWUNDO: u16 = 0x0040;
-pub const FOF_WANTNUKEWARNING: u16 = 0x4000;
+const FO_DELETE: u16 = 0x0003;
+const FOF_ALLOWUNDO: u16 = 0x0040;
+const FOF_WANTNUKEWARNING: u16 = 0x4000;
 
 #[derive(Debug)]
 #[repr(C)]
-pub struct SHFILEOPSTRUCTW {
+struct SHFILEOPSTRUCTW {
     pub hwnd: *mut std::ffi::c_void,
     /// A value that indicates which operation to perform.
     pub w_func: u32,
