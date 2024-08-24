@@ -21,7 +21,9 @@ pub fn now() -> String {
 }
 
 #[cfg(target_os = "windows")]
-mod win {
+#[doc(hidden)]
+#[inline]
+pub fn now() -> String {
     #[repr(C)]
     #[derive(Copy, Clone, Debug, Default)]
     pub struct SystemTime {
@@ -36,52 +38,21 @@ mod win {
     }
 
     extern "system" {
-        pub fn GetLocalTime(lpsystemtime: *mut SystemTime);
+        fn GetLocalTime(lpsystemtime: *mut SystemTime);
     }
-}
 
-#[cfg(target_os = "windows")]
-#[inline(always)]
-#[doc(hidden)]
-pub fn now() -> String {
-    let mut time = win::SystemTime::default();
-    unsafe { win::GetLocalTime(&mut time) };
+    let mut time = SystemTime::default();
+    unsafe { GetLocalTime(&mut time) };
     format!("{:02}:{:02}:{:02}", time.hour, time.minute, time.second)
 }
-
-#[doc(hidden)]
-#[repr(u8)]
-pub enum Level {
-    None,
-    Error,
-    Warn,
-    Info,
-}
-
-#[doc(hidden)]
-#[cfg(all(not(feature = "warn"), not(feature = "error"), not(feature = "info")))]
-pub const MAX_LEVEL: u8 = Level::None as u8;
-
-#[doc(hidden)]
-#[cfg(all(feature = "info", not(feature = "warn"), not(feature = "error")))]
-pub const MAX_LEVEL: u8 = Level::Info as u8;
-
-#[doc(hidden)]
-#[cfg(all(feature = "warn", not(feature = "error"), not(feature = "info")))]
-pub const MAX_LEVEL: u8 = Level::Warn as u8;
-
-#[doc(hidden)]
-#[cfg(all(feature = "error", not(feature = "warn"), not(feature = "info")))]
-pub const MAX_LEVEL: u8 = Level::Error as u8;
 
 #[macro_export]
 macro_rules! info {
     ($($arg:tt)*) => {
+        #[cfg(feature = "info")]
         {
-            if $crate::MAX_LEVEL >= $crate::Level::Info as u8 {
-                eprint!("\x1b[90m{} \x1b[92mINFO\x1b[0m {}:\x1b[30m{}\x1b[0m - ", $crate::now(), file!(), line!());
-                eprintln!($($arg)*);
-            }
+            eprint!("\x1b[90m{} \x1b[92mINFO\x1b[0m {}:\x1b[30m{}\x1b[0m - ", $crate::now(), file!(), line!());
+            eprintln!($($arg)*);
         }
     };
 }
@@ -89,23 +60,10 @@ macro_rules! info {
 #[macro_export]
 macro_rules! info_raw {
     ($($arg:tt)*) => {
+        #[cfg(feature = "info")]
         {
-            if $crate::MAX_LEVEL >= $crate::Level::Info as u8 {
-                eprint!("\x1b[90m{} \x1b[92mINFO\x1b[0m ", $crate::now());
-                eprintln!($($arg)*);
-            }
-        }
-    };
-}
-
-#[macro_export]
-macro_rules! warn_raw {
-    ($($arg:tt)*) => {
-        {
-            if $crate::MAX_LEVEL >= $crate::Level::Warn as u8 {
-                eprint!("\x1b[90m{} \x1b[93mWARN\x1b[0m ", $crate::now());
-                eprintln!($($arg)*);
-            }
+            eprint!("\x1b[90m{} \x1b[92mINFO\x1b[0m ", $crate::now());
+            eprintln!($($arg)*);
         }
     };
 }
@@ -113,11 +71,21 @@ macro_rules! warn_raw {
 #[macro_export]
 macro_rules! warn {
     ($($arg:tt)*) => {
+        #[cfg(any(feature = "warn", feature = "info"))]
         {
-            if $crate::MAX_LEVEL >= $crate::Level::Warn as u8 {
-                eprint!("\x1b[90m{} \x1b[93mWARN\x1b[0m {}:\x1b[30m{}\x1b[0m - ", $crate::now(), file!(), line!());
-                eprintln!($($arg)*);
-            }
+            eprint!("\x1b[90m{} \x1b[93mWARN\x1b[0m {}:\x1b[30m{}\x1b[0m - ", $crate::now(), file!(), line!());
+            eprintln!($($arg)*);
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! warn_raw {
+    ($($arg:tt)*) => {
+        #[cfg(any(feature = "warn", feature = "info"))]
+        {
+            eprint!("\x1b[90m{} \x1b[93mWARN\x1b[0m ", $crate::now());
+            eprintln!($($arg)*);
         }
     };
 }
@@ -125,11 +93,10 @@ macro_rules! warn {
 #[macro_export]
 macro_rules! error {
     ($($arg:tt)*) => {
+        #[cfg(any(feature = "error", feature = "warn", feature = "info"))]
         {
-            if $crate::MAX_LEVEL >= $crate::Level::Error as u8 {
-                eprint!("\x1b[90m{} \x1b[91mERROR\x1b[0m {}:\x1b[30m{}\x1b[0m - ", $crate::now(), file!(), line!());
-                eprintln!($($arg)*);
-            }
+            eprint!("\x1b[90m{} \x1b[91mERROR\x1b[0m {}:\x1b[30m{}\x1b[0m - ", $crate::now(), file!(), line!());
+            eprintln!($($arg)*);
         }
     };
 }
@@ -137,11 +104,10 @@ macro_rules! error {
 #[macro_export]
 macro_rules! error_raw {
     ($($arg:tt)*) => {
+        #[cfg(any(feature = "error", feature = "warn", feature = "info"))]
         {
-            if $crate::MAX_LEVEL >= $crate::Level::Error as u8 {
-                eprint!("\x1b[90m{} \x1b[91mERROR\x1b[0m ", $crate::now());
-                eprintln!($($arg)*);
-            }
+            eprint!("\x1b[90m{} \x1b[91mERROR\x1b[0m ", $crate::now());
+            eprintln!($($arg)*);
         }
     };
 }
