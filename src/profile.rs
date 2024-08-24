@@ -1,4 +1,3 @@
-///! TODO: Fix profile feature.
 use std::{
     collections::{hash_map::Entry, HashMap},
     fmt::Write,
@@ -6,6 +5,7 @@ use std::{
     time::{Duration, Instant},
 };
 
+//TODO: Yikes.
 #[doc(hidden)]
 pub static mut EVENTS: Mutex<Vec<ProfileEvent>> = Mutex::new(Vec::new());
 
@@ -15,13 +15,13 @@ pub static mut EVENTS: Mutex<Vec<ProfileEvent>> = Mutex::new(Vec::new());
 /// Otherwise it won't be dropped last and can't print all the results.
 macro_rules! defer_results {
     () => {
-        #[cfg(not(feature = "strip"))]
+        #[cfg(feature = "profile")]
         let _d = $crate::Defer(Some(|| {
             $crate::results(None);
         }));
     };
     ($($name:expr),*) => {
-        #[cfg(not(feature = "strip"))]
+        #[cfg(feature = "profile")]
         {
             let names = &[$(
                 $name
@@ -37,11 +37,11 @@ macro_rules! defer_results {
 /// Print the profiling results.
 macro_rules! results {
     () => {
-        #[cfg(not(feature = "strip"))]
+        #[cfg(feature = "profile")]
         $crate::results(None);
     };
     ($($name:expr),*) => {
-        #[cfg(not(feature = "strip"))]
+        #[cfg(feature = "profile")]
         {
             let names = &[$(
                 $name
@@ -133,6 +133,8 @@ fn calculate(map: HashMap<ProfileLocation, Vec<ProfileEvent>>) -> String {
         writeln!(&mut string, "  - max:   {:?}\n", score.max).unwrap();
     }
 
+    let mut string = string.trim_end().to_string();
+    string.push('\n');
     string
 }
 
@@ -201,43 +203,43 @@ impl<F: FnOnce()> Drop for Defer<F> {
 macro_rules! profile {
     () => {
         #[cfg(feature = "profile")]
-        let full_name = $crate::function!();
-        #[cfg(feature = "profile")]
-        let name = &full_name[full_name.find("::").unwrap() + 2..];
-        #[cfg(feature = "profile")]
-        let mut event = $crate::ProfileEvent {
-            location: $crate::ProfileLocation {
-                full_name,
-                name,
-                file: file!(),
-                line: line!(),
-            },
-            start: Some(std::time::Instant::now()),
-            end: None,
-        };
-        #[cfg(feature = "profile")]
-        let _d = $crate::Defer(Some(|| {
-            event.end = Some(std::time::Instant::now());
-            unsafe { $crate::EVENTS.lock().unwrap().push(event) };
-        }));
+        {
+            let full_name = $crate::function!();
+            let name = &full_name[full_name.find("::").unwrap() + 2..];
+            let mut event = $crate::ProfileEvent {
+                location: $crate::ProfileLocation {
+                    full_name,
+                    name,
+                    file: file!(),
+                    line: line!(),
+                },
+                start: Some(std::time::Instant::now()),
+                end: None,
+            };
+            let _d = $crate::Defer(Some(|| {
+                event.end = Some(std::time::Instant::now());
+                unsafe { $crate::EVENTS.lock().unwrap().push(event) };
+            }));
+        }
     };
     ($name:expr) => {
         #[cfg(feature = "profile")]
-        let mut event = $crate::ProfileEvent {
-            location: $crate::ProfileLocation {
-                full_name: $name,
-                name: $name,
-                file: file!(),
-                line: line!(),
-            },
-            start: Some(std::time::Instant::now()),
-            end: None,
-        };
-        #[cfg(not(feature = "strip"))]
-        let _d = $crate::Defer(Some(|| {
-            event.end = Some(std::time::Instant::now());
-            unsafe { $crate::EVENTS.lock().unwrap().push(event) };
-        }));
+        {
+            let mut event = $crate::ProfileEvent {
+                location: $crate::ProfileLocation {
+                    full_name: $name,
+                    name: $name,
+                    file: file!(),
+                    line: line!(),
+                },
+                start: Some(std::time::Instant::now()),
+                end: None,
+            };
+            let _d = $crate::Defer(Some(|| {
+                event.end = Some(std::time::Instant::now());
+                unsafe { $crate::EVENTS.lock().unwrap().push(event) };
+            }));
+        }
     };
 }
 

@@ -8,11 +8,13 @@ fn main() {
 }
 ```
 
-Use `--features "strip"` to remove logging from your build.
+Use `--features "info"` to show info, warnings and errors.
 
-Use `--features "warn"` to hide info.
+Use `--features "warn"` to show warnings and errors.
 
-Use `--features "error"` to hide info and warnings.
+Use `--features "error"` to show only errors.
+
+Use `--features "profile"` to enable profiling.
 
 ```rs
 use mini::profile;
@@ -28,8 +30,7 @@ fn test_fn_2() {
 fn main() {
     test_fn();
     test_fn_2();
-
-    println!("{}", miniprofile::results());
+    results!();
 }
 ```
 
