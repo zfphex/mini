@@ -20,16 +20,18 @@ macro_rules! defer_results {
             $crate::results(None);
         }));
     };
+    //Only show the functions with the matching names.
+    //defer_results!("mini::main", "mini::results")
     ($($name:expr),*) => {
         #[cfg(feature = "profile")]
-        {
+        let _d = {
             let names = &[$(
                 $name
             ),*];
-            let _d = $crate::Defer(Some(|| {
+            $crate::Defer(Some(|| {
                 $crate::results(Some(names));
-            }));
-        }
+            }))
+        };
     };
 }
 
@@ -203,7 +205,7 @@ impl<F: FnOnce()> Drop for Defer<F> {
 macro_rules! profile {
     () => {
         #[cfg(feature = "profile")]
-        {
+        let _d = {
             let full_name = $crate::function!();
             let name = &full_name[full_name.find("::").unwrap() + 2..];
             let mut event = $crate::ProfileEvent {
@@ -216,15 +218,15 @@ macro_rules! profile {
                 start: Some(std::time::Instant::now()),
                 end: None,
             };
-            let _d = $crate::Defer(Some(|| {
+            $crate::Defer(Some(|| {
                 event.end = Some(std::time::Instant::now());
                 unsafe { $crate::EVENTS.lock().unwrap().push(event) };
-            }));
-        }
+            }))
+        };
     };
     ($name:expr) => {
         #[cfg(feature = "profile")]
-        {
+        let _d = {
             let mut event = $crate::ProfileEvent {
                 location: $crate::ProfileLocation {
                     full_name: $name,
@@ -235,11 +237,11 @@ macro_rules! profile {
                 start: Some(std::time::Instant::now()),
                 end: None,
             };
-            let _d = $crate::Defer(Some(|| {
+            $crate::Defer(Some(|| {
                 event.end = Some(std::time::Instant::now());
                 unsafe { $crate::EVENTS.lock().unwrap().push(event) };
-            }));
-        }
+            }))
+        };
     };
 }
 
