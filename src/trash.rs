@@ -1,71 +1,74 @@
-#[link(name = "shell32")]
-extern "system" {
-    fn SHFileOperationW(lpFileOp: *mut SHFILEOPSTRUCTW) -> i32;
-}
+#[cfg(target_os = "windows")]
+mod windows {
 
-const FO_DELETE: u16 = 0x0003;
-const FOF_ALLOWUNDO: u16 = 0x0040;
-const FOF_WANTNUKEWARNING: u16 = 0x4000;
+    #[link(name = "shell32")]
+    extern "system" {
+        fn SHFileOperationW(lpFileOp: *mut SHFILEOPSTRUCTW) -> i32;
+    }
 
-#[derive(Debug)]
-#[repr(C)]
-struct SHFILEOPSTRUCTW {
-    pub hwnd: *mut std::ffi::c_void,
-    /// A value that indicates which operation to perform.
-    pub w_func: u32,
-    /// A pointer to one or more source file names.
-    /// This string must be double-null terminated.
-    pub p_from: *const u16,
-    /// A pointer to the destination file or directory name.
-    /// This parameter must be set to NULL if it is not used.
-    /// This string must be double-null terminated.
-    pub p_to: *const u16,
-    ///Flags that control the file operation.
-    pub f_flags: u16,
-    /// When the function returns, this member contains TRUE if any file operations were aborted before they were completed; otherwise, FALSE.
-    /// An operation can be manually aborted by the user through UI or it can be silently aborted by the system if the FOF_NOERRORUI or FOF_NOCONFIRMATION flags were set.
-    pub f_any_operations_aborted: i32,
-    pub h_name_mappings: *mut std::ffi::c_void,
-    /// A pointer to the title of a progress dialog box.
-    /// This is a null-terminated string.
-    /// This member is used only if fFlags includes the FOF_SIMPLEPROGRESS flag.
-    pub l_psz_progress_title: *const u16,
-}
+    const FO_DELETE: u16 = 0x0003;
+    const FOF_ALLOWUNDO: u16 = 0x0040;
+    const FOF_WANTNUKEWARNING: u16 = 0x4000;
 
-/// Send a file/folder to the Recycle Bin.
-/// You should use fully qualified path names with this function.
-/// This function is very slow, consider spawning a new thread to handle deletions.
-#[must_use]
-pub fn trash<P: AsRef<std::path::Path>>(path: P) -> Result<(), &'static str> {
-    crate::profile!();
-    use std::os::windows::ffi::OsStrExt;
+    #[derive(Debug)]
+    #[repr(C)]
+    struct SHFILEOPSTRUCTW {
+        pub hwnd: *mut std::ffi::c_void,
+        /// A value that indicates which operation to perform.
+        pub w_func: u32,
+        /// A pointer to one or more source file names.
+        /// This string must be double-null terminated.
+        pub p_from: *const u16,
+        /// A pointer to the destination file or directory name.
+        /// This parameter must be set to NULL if it is not used.
+        /// This string must be double-null terminated.
+        pub p_to: *const u16,
+        ///Flags that control the file operation.
+        pub f_flags: u16,
+        /// When the function returns, this member contains TRUE if any file operations were aborted before they were completed; otherwise, FALSE.
+        /// An operation can be manually aborted by the user through UI or it can be silently aborted by the system if the FOF_NOERRORUI or FOF_NOCONFIRMATION flags were set.
+        pub f_any_operations_aborted: i32,
+        pub h_name_mappings: *mut std::ffi::c_void,
+        /// A pointer to the title of a progress dialog box.
+        /// This is a null-terminated string.
+        /// This member is used only if fFlags includes the FOF_SIMPLEPROGRESS flag.
+        pub l_psz_progress_title: *const u16,
+    }
 
-    let path = match path.as_ref().canonicalize() {
-        //Replace the UNC prefix.
-        Ok(path) => path.to_string_lossy().replace("\\\\?\\", ""),
-        Err(_) => return Err("Could not find path"),
-    };
+    /// Send a file/folder to the Recycle Bin.
+    /// You should use fully qualified path names with this function.
+    /// This function is very slow, consider spawning a new thread to handle deletions.
+    #[must_use]
+    pub fn trash<P: AsRef<std::path::Path>>(path: P) -> Result<(), &'static str> {
+        crate::profile!();
+        use std::os::windows::ffi::OsStrExt;
 
-    //This string must be double-null terminated.
-    let os_path: Vec<u16> = std::ffi::OsString::from(path)
-        .encode_wide()
-        .chain(Some(0))
-        .chain(Some(0))
-        .collect();
+        let path = match path.as_ref().canonicalize() {
+            //Replace the UNC prefix.
+            Ok(path) => path.to_string_lossy().replace("\\\\?\\", ""),
+            Err(_) => return Err("Could not find path"),
+        };
 
-    let mut fileop = SHFILEOPSTRUCTW {
-        hwnd: std::ptr::null_mut(),
-        w_func: FO_DELETE as u32,
-        p_from: os_path.as_ptr(),
-        p_to: std::ptr::null(),
-        f_flags: FOF_ALLOWUNDO | FOF_WANTNUKEWARNING,
-        f_any_operations_aborted: 0,
-        h_name_mappings: std::ptr::null_mut(),
-        l_psz_progress_title: std::ptr::null(),
-    };
+        //This string must be double-null terminated.
+        let os_path: Vec<u16> = std::ffi::OsString::from(path)
+            .encode_wide()
+            .chain(Some(0))
+            .chain(Some(0))
+            .collect();
 
-    let result = unsafe { SHFileOperationW(&mut fileop) };
-    match result {
+        let mut fileop = SHFILEOPSTRUCTW {
+            hwnd: std::ptr::null_mut(),
+            w_func: FO_DELETE as u32,
+            p_from: os_path.as_ptr(),
+            p_to: std::ptr::null(),
+            f_flags: FOF_ALLOWUNDO | FOF_WANTNUKEWARNING,
+            f_any_operations_aborted: 0,
+            h_name_mappings: std::ptr::null_mut(),
+            l_psz_progress_title: std::ptr::null(),
+        };
+
+        let result = unsafe { SHFileOperationW(&mut fileop) };
+        match result {
             0x0 => {Ok(())}
             0x2 => Err("The system cannot find the file specified."),
             0x5 => Err("Access is denied."),
@@ -96,4 +99,5 @@ pub fn trash<P: AsRef<std::path::Path>>(path: P) -> Result<(), &'static str> {
             //https://learn.microsoft.com/en-us/windows/win32/debug/system-error-codes--0-499-
             _ => panic!("Unknown error, see system error code: {:#02x}", result),
         }
+    }
 }
