@@ -10,5 +10,7 @@ pub use args::*;
 pub use log::*;
 pub use profile::*;
 pub use reflect::*;
-pub use trash::*;
 pub use ansi::*;
+
+#[cfg(target_os = "windows")]
+pub use trash::windows::*;
