@@ -1,16 +1,16 @@
-#![allow(unused_imports)]
+#![allow(unused_imports, static_mut_refs)]
+mod ansi;
 mod args;
 mod log;
 mod profile;
 mod reflect;
 mod trash;
-mod ansi;
 
+pub use ansi::*;
 pub use args::*;
 pub use log::*;
 pub use profile::*;
 pub use reflect::*;
-pub use ansi::*;
 
 #[cfg(target_os = "windows")]
 pub use trash::windows::*;
