@@ -51,7 +51,7 @@ macro_rules! info {
     ($($arg:tt)*) => {
         #[cfg(feature = "info")]
         {
-            eprint!("\x1b[90m{} \x1b[92mINFO\x1b[0m {}:\x1b[30m{}\x1b[0m - ", $crate::now(), file!(), line!());
+            eprint!("\x1b[90m{} \x1b[92mINFO\x1b[0m {}:{}\x1b[0m - ", $crate::now(), file!(), line!());
             eprintln!($($arg)*);
         }
     };
@@ -73,7 +73,7 @@ macro_rules! warn {
     ($($arg:tt)*) => {
         #[cfg(any(feature = "warn", feature = "info"))]
         {
-            eprint!("\x1b[90m{} \x1b[93mWARN\x1b[0m {}:\x1b[30m{}\x1b[0m - ", $crate::now(), file!(), line!());
+            eprint!("\x1b[90m{} \x1b[93mWARN\x1b[0m {}:{}\x1b[0m - ", $crate::now(), file!(), line!());
             eprintln!($($arg)*);
         }
     };
@@ -95,7 +95,7 @@ macro_rules! error {
     ($($arg:tt)*) => {
         #[cfg(any(feature = "error", feature = "warn", feature = "info"))]
         {
-            eprint!("\x1b[90m{} \x1b[91mERROR\x1b[0m {}:\x1b[30m{}\x1b[0m - ", $crate::now(), file!(), line!());
+            eprint!("\x1b[90m{} \x1b[91mERROR\x1b[0m {}:{}\x1b[0m - ", $crate::now(), file!(), line!());
             eprintln!($($arg)*);
         }
     };
