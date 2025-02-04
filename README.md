@@ -8,6 +8,17 @@ fn main() {
 }
 ```
 
+Enable features by adding this to your `Cargo.toml` file.
+
+```
+profile = ["mini/profile"]
+info = ["mini/info"]
+warn = ["mini/warn"]
+error = ["mini/error"]
+```
+
+Then use them by adding the correct feature flag.
+
 Use `--features "info"` to show info, warnings and errors.
 
 Use `--features "warn"` to show warnings and errors.
@@ -47,5 +58,3 @@ miniprofile::test_fn (1 runs) src\main.rs:4
   - min:   400ns
   - max:   400ns
 ```
-
-Use `--features "strip"` to remove profiling from your build.
