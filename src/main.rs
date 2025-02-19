@@ -9,6 +9,7 @@ args![
 ];
 
 fn main() {
+    defer_results!();
     profile!();
 
     info!("info");
@@ -22,5 +23,4 @@ fn main() {
         Command::Empty => help(),
         _ => {}
     }
-    results!();
 }

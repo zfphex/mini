@@ -35,8 +35,8 @@ macro_rules! defer_results {
     };
 }
 
-#[macro_export]
 /// Print the profiling results.
+#[macro_export]
 macro_rules! results {
     () => {
         #[cfg(feature = "profile")]
@@ -129,10 +129,10 @@ fn calculate(map: HashMap<ProfileLocation, Vec<ProfileEvent>>) -> String {
             score.full_name, score.count, score.file, score.line,
         )
         .unwrap();
-        writeln!(&mut string, "  - total: {:?}", score.total).unwrap();
-        writeln!(&mut string, "  - mean:  {:?}", score.mean).unwrap();
-        writeln!(&mut string, "  - min:   {:?}", score.min).unwrap();
-        writeln!(&mut string, "  - max:   {:?}\n", score.max).unwrap();
+        writeln!(&mut string, "  - total: {:.2?}", score.total).unwrap();
+        writeln!(&mut string, "  - mean:  {:.2?}", score.mean).unwrap();
+        writeln!(&mut string, "  - min:   {:.2?}", score.min).unwrap();
+        writeln!(&mut string, "  - max:   {:.2?}\n", score.max).unwrap();
     }
 
     let mut string = string.trim_end().to_string();
