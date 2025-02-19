@@ -125,8 +125,12 @@ fn calculate(map: HashMap<ProfileLocation, Vec<ProfileEvent>>) -> String {
     for score in scores {
         writeln!(
             &mut string,
-            "{} ({} runs) {}:{}",
-            score.full_name, score.count, score.file, score.line,
+            "{} ({} {}) {}:{}",
+            score.full_name,
+            score.count,
+            if score.count == 1 { "run" } else { "runs" },
+            score.file,
+            score.line,
         )
         .unwrap();
         writeln!(&mut string, "  - total: {:.2?}", score.total).unwrap();
