@@ -91,7 +91,7 @@ fn calculate(map: HashMap<ProfileLocation, Vec<ProfileEvent>>) -> String {
     let mut scores = Vec::new();
 
     for (k, v) in map.iter() {
-        let mut mean = Duration::default();
+        let mut total = Duration::default();
         let mut min = v.get(0).unwrap_or(&ProfileEvent::default()).elapsed();
         let mut max = Duration::default();
 
@@ -106,15 +106,15 @@ fn calculate(map: HashMap<ProfileLocation, Vec<ProfileEvent>>) -> String {
                 max = elapsed;
             }
 
-            mean += elapsed;
+            total += elapsed;
         }
 
         scores.push(ProfileScore {
             full_name: k.full_name,
             file: k.file,
             line: k.line,
-            total: mean,
-            mean: Duration::from_secs_f64(mean.as_secs_f64() / v.len() as f64),
+            total,
+            mean: Duration::from_secs_f64(total.as_secs_f64() / v.len() as f64),
             min,
             max,
             count: v.len(),
