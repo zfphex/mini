@@ -87,7 +87,7 @@ pub fn results(names: Option<&[&str]>) {
     println!("{}", results);
 }
 
-fn calculate(map: HashMap<ProfileLocation, Vec<ProfileEvent>>) -> String {
+pub fn calculate(map: HashMap<ProfileLocation, Vec<ProfileEvent>>) -> String {
     let mut scores = Vec::new();
 
     for (k, v) in map.iter() {

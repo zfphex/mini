@@ -9,6 +9,7 @@ readme = "README.md"
 license = "CC0-1.0"
 
 [dependencies]
+crossbeam-channel = { version = "0.5.15" }
 
 [features]
 profile = [] # Enable profiling.
